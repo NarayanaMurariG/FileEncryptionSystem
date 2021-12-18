@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Encryption System</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta charset="utf-8" />
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+</head>
+<body>
+    <h4 class="modal-title w-100 font-weight-bold">EFS Login Page</h4>
+<div>
+
+        <div class="md-form mb-5">
+          <i class="fas fa-user prefix grey-text"></i>
+          <input type="text" id="username" class="form-control validate" placeholder="Username">
+<!--          <label data-error="wrong" data-success="right" for="orangeForm-name">UserName</label>-->
+        </div>
+        <br>
+        <div class="md-form mb-4">
+          <i class="fas fa-lock prefix grey-text"></i>
+          <input type="password" id="secret_key" class="form-control validate" placeholder="Your Secret Key">
+<!--          <label data-error="wrong" data-success="right" for="orangeForm-pass">Your Private Key</label>-->
+        </div>
+
+        <br>
+        <form>
+          <button name="loginBtn" type="button" onclick="login_func()">Login</button>
+        </form>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script>
+  function login_func(){
+  const username = document.getElementById('username').value;
+  const secret_key = document.getElementById('secret_key').value;
+    console.log(username);
+    console.log(secret_key);
+    const userData = {
+        "username": username,
+        "secret_key": secret_key
+    };
+  $.ajax({
+      url: '/authenticate-user',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          console.log("You are an authenticated user");
+          localStorage.setItem("UserDetails", JSON.stringify(userData));
+          if (data.responseCode === 1) {
+              const userInformation = JSON.parse(
+                    localStorage.getItem("UserDetails")
+                    );
+              const url = "http://127.0.0.1:8000/user-home/";
+              window.location.replace(url);
+          }
+          else {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+
+      },
+      error: function (error) {
+          console.log("You are not an authenticated user");
+          alert("You are not an authunticated user")
+      }
+  });
+}
+
+
+</script>
+</body>
+</html>
+

@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Encryption System</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta charset="utf-8" />
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</head>
+<body style="margin-left: 10%">
+<script>
+    $(document).ready(function () {
+    loadallusers();
+
+    // Files section
+    loadprivatefiles();
+    loadpublicfiles();
+    loadsharedfiles();
+  });
+
+</script>
+<div class="col-md-6 mb-md-0 mb-4">
+    <div style="float:right">
+        <button name="logout" type="submit" id="logout" onclick="logout()">Log Out</button>
+    </div>
+
+    <!--Title-->
+    <h2 class="">
+      Upload a file to EFS
+    </h2>
+
+    <!--Upload File-->
+    <section class="section-preview">
+      <form class="md-form my-3">
+        <div class="file-path-wrapper">
+          <input class="filepath" id="filepath" type="text" placeholder="Name your file" required>
+        </div>
+          <br>
+        <div class="file-path-wrapper">
+            <textarea class="filedata" id="filedata" placeholder="Enter contents of file" rows="15" cols="40" required></textarea>
+        </div>
+          <br>
+          <div>
+          <select id="selectAccessLevel">
+                <option value="private"> Private </option>
+              <option value="public"> Public </option>
+            </select>
+          </div>
+          <br>
+          <div>
+          <button name="login_to_userhome_Btn" onclick="Uploadfiles()">Upload</button>
+        </div>
+          <br>
+      </form>
+    </section>
+
+    <!--Share file-->
+
+    <h2 class="">
+        Share a file with other users
+      </h2>
+    
+      <!--Share file-->
+<!--      <section class="section-preview">-->
+<!--          <label for="userList">Choose one user to share file with</label>-->
+<!--          <select name="userList" id="userList"></select>-->
+
+<!--          <div class="userList">-->
+<!--              <select name="userList" id="users" aria-describedby="users" class="form-control"></select>-->
+<!--          </div>-->
+            <select id="selectUser">
+<!--                <option> Select User to share with </option>-->
+                <option value=""> Select User to share with </option>
+            </select>
+            <br><br>
+
+
+            <select id="selectFile">
+                <option value=""> Select File </option>
+            </select>
+            <br>
+            <br>
+
+<!--          <div class="file-path-wrapper">-->
+<!--            <input class="file-path validate" type="text" placeholder="Enter full filepath to file">-->
+<!--          </div>-->
+
+          <div>
+            <button name="Share" onclick="Sharefiles()"> Share </button>
+          </div>
+<!--      </section>-->
+
+    <!--Various directories-->
+    <br>
+    <h2 class="">
+        Your private files with absolute path are listed below
+    </h2>
+    <div id="myDynamicTablePvt"></div>
+    <br><br>
+
+    <h2 class="">
+        Files shared to you are listed below
+    </h2>
+    <div id="myDynamicTableShared"></div>
+    <br><br>
+
+    <h2 class="">
+        All public files are listed below
+    </h2>
+    <p>User can only edit files which they own</p>
+    <div id="myDynamicTablePublic"></div>
+    <br><br>
+
+<!--    This is to View File-->
+    <div class="modal" id="myModalView" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width: 1000px;margin-right: 10%;margin-inline: -47%;height: 600px;">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">View File</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <textarea id="decrypted_file_output" style="width: 900px;height: 435px"></textarea>
+<!--            <div id="decrypted_file_output">-->
+<!--                File Out Put Will be Displayed Here-->
+<!--            </div>-->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+<!--            <button type="button" class="btn btn-primary">Save changes</button>-->
+          </div>
+        </div>
+      </div>
+    </div>
+<!--        View File Ends Here-->
+
+        <!--    This is to Edit File-->
+    <div class="modal" id="myModalEdit" tabindex="-1" role="dialog" aria-labelledby="editModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width: 1000px;margin-right: 10%;margin-inline: -47%;height: 700px;">
+          <div class="modal-header">
+            <h5 class="modal-title" >Edit File</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <div style="display: none" id="access-level"></div>
+              <div id="oldfilepath"></div>
+              <textarea id="fileName" style="width: 900px;height: 25px;" placeholder="Enter updated filepath"></textarea>
+              <textarea id="textBox" style="width: 900px;height: 400px;">Edit your file Here</textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="editFileInServer()">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+<!--       Edit Modal Ends Here-->
+    </div>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script>
+
+
+  function editFileInServer(){
+      const access_level = document.getElementById('access-level').innerHTML;
+      if(access_level == "private"){
+          editPrivateFileInServer();
+      }else{
+          editPublicFileInServer();
+      }
+  };
+
+  function editPrivateFileInServer(){
+    const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+    const publicFiles = JSON.parse(
+        localStorage.getItem("PublicFiles")
+    );
+    const privateFiles = JSON.parse(
+        localStorage.getItem("PrivateFiles")
+    );
+    const results = publicFiles[userInformation.username]
+    const private_keys = Object.keys(privateFiles);
+
+    const file_names = private_keys.concat(results);
+    const oldfilepath = document.getElementById("oldfilepath").innerHTML;
+    let newfilepath = document.getElementById("fileName").value;
+    const access_level = document.getElementById("access-level").innerHTML;
+    if(newfilepath === ""){
+        newfilepath = oldfilepath;
+    }
+    else if(file_names.includes((newfilepath))){
+        alert("This filepath already exists, please use different filepath");
+        return null;
+    }
+    const fileData = document.getElementById("textBox").value;
+    const userData = {
+        "username": userInformation.username,
+        "secret_key": userInformation.secret_key,
+        "file_data": fileData,
+        "access_level": access_level,
+        "newfilepath": newfilepath,
+        "oldfilepath": privateFiles[oldfilepath]
+    }
+
+    console.log(newfilepath);
+    console.log(fileData);
+      $.ajax({
+      url: '/edit-private-file',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+              console.log("success");
+
+              const result = data["responseMessage"];
+              const filename = data["filename"];
+              // console.log(filename)
+              // console.log(result)
+              // document.getElementById('oldfilepath').innerHTML = filename;
+              // document.getElementById('textBox').innerHTML = result;
+              $('#myModalEdit').modal('hide');
+              window.location.reload()
+          }
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+      }
+  });
+
+  }
+
+  function editPublicFileInServer(){
+    const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+     const publicFiles = JSON.parse(
+        localStorage.getItem("PublicFiles")
+    );
+    const privateFiles = JSON.parse(
+        localStorage.getItem("PrivateFiles")
+    );
+
+    const results = publicFiles[userInformation.username]
+    const private_keys = Object.keys(privateFiles);
+
+    const file_names = private_keys.concat(results);
+    const oldfilepath = document.getElementById("oldfilepath").innerHTML;
+    let newfilepath = document.getElementById("fileName").value;
+    const access_level = document.getElementById("access-level").innerHTML;
+    if(newfilepath === ""){
+        newfilepath = oldfilepath;
+    }else if(file_names.includes((newfilepath))){
+        alert("This filepath already exists, please use different filepath");
+        return null;
+    }
+
+    const fileData = document.getElementById("textBox").value;
+    const userData = {
+        "username": userInformation.username,
+        "file_data": fileData,
+        "access_level": access_level,
+        "newfilepath": newfilepath,
+        "oldfilepath": oldfilepath
+    }
+
+    console.log(newfilepath);
+    console.log(fileData);
+      $.ajax({
+      url: '/edit-public-file',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+              console.log("success");
+
+              const result = data["responseMessage"];
+              const filename = data["file"];
+              alert(result);
+              // console.log(filename)
+              console.log(result)
+              // document.getElementById('oldfilepath').innerHTML = filename;
+              // document.getElementById('textBox').innerHTML = result;
+              $('#myModalEdit').modal('hide');
+              window.location.reload()
+          }
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+      }
+  });
+
+  }
+
+
+
+  function logout() {
+      localStorage.clear();
+      const url = "http://127.0.0.1:8000/";
+      window.location.replace(url);
+  }
+
+  function loadallusers() {
+      const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+
+    const userData = {
+        "username": userInformation.username
+    };
+
+      $.ajax({
+      url: '/getallusers',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          console.log("success");
+          console.log("Data: " + JSON.stringify(data));
+          const select = document.getElementById("selectUser");
+          for(let i = 0; i < data.length; i++) {
+            const opt = data[i];
+            const el = document.createElement("option");
+            el.textContent = opt;
+            el.value = opt;
+            select.appendChild(el);
+        }
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+      }
+  });
+  }
+
+  function changePermission(filepath,access_level) {
+      const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+      const userData = {
+        "username": userInformation.username,
+        "secret_key": userInformation.secret_key,
+        "access_level": access_level,
+        "file_path": filepath
+    };
+
+      $.ajax({
+      url: '/change-file-permission',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+              console.log("success");
+              const result = data.responseMessage;
+              console.log(result);
+              alert(result);
+          }
+          window.location.reload();
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+      }
+  });
+
+  }
+
+  function getPublicFileFromServer(filepath){
+      const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+
+    const userData = {
+        "username": userInformation.username,
+        "file_name": filepath
+    };
+      $.ajax({
+      url: '/get-public-file',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+              console.log("success");
+
+              const result = data[0]["fileData"];
+              console.log(result)
+              document.getElementById('decrypted_file_output').innerHTML = result;
+              $('#myModalView').modal('show');
+          }
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+      }
+  });
+  }
+
+    function getSharedFileFromServer(filepath){
+      const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+
+    const userData = {
+        "username": userInformation.username,
+        "secret_key": userInformation.secret_key,
+        "encrypted_file_path": filepath
+    };
+      $.ajax({
+      url: '/get_shared_file',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+              console.log("success");
+              const result = data.responseMessage;
+              document.getElementById('decrypted_file_output').innerHTML = result;
+              $('#myModalView').modal('show');
+          }
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+      }
+  });
+  }
+
+    function getFileFromServer(filepath){
+      const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+
+    const userData = {
+        "username": userInformation.username,
+        "secret_key": userInformation.secret_key,
+        "encrypted_file_path": filepath
+    };
+      $.ajax({
+      url: '/get-file',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+              console.log("success");
+              const result = data.responseMessage;
+              console.log(result);
+              document.getElementById('decrypted_file_output').innerHTML = result;
+              $('#myModalView').modal('show');
+          }
+      },
+      error: function (error) {
+          console.log(error);
+          alert("Malicious activity occoured on server");
+        //   alert(error);
+      }
+  });
+  }
+
+
+  function getEncryptedFileFromServer(filepath) {
+      const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+
+    const userData = {
+        "username": userInformation.username,
+        "secret_key": userInformation.secret_key,
+        "encrypted_file_path": filepath
+    };
+
+    $.ajax({
+      url: '/get-encrypted-file',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+              console.log("success");
+              const result = data.responseMessage;
+              console.log(result);
+              document.getElementById('decrypted_file_output').innerHTML = result;
+              $('#myModalView').modal('show');
+          }
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+      }
+  });
+  }
+
+
+  function getEncryptedSharedFileFromServer(filepath) {
+      const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+
+    const userData = {
+        "username": userInformation.username,
+        "secret_key": userInformation.secret_key,
+        "encrypted_file_path": filepath
+    };
+
+    $.ajax({
+      url: '/get-encrypted-shared-file',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+              console.log("success");
+              const result = data.responseMessage;
+              console.log(result);
+              document.getElementById('decrypted_file_output').innerHTML = result;
+              $('#myModalView').modal('show');
+          }
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+      }
+  });
+  }
+
+
+  function editFileOnServer(filepath){
+    const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+
+    const userData = {
+        "username": userInformation.username,
+        "secret_key" : userInformation.secret_key,
+        "encrypted_file_path": filepath
+    };
+      $.ajax({
+      url: '/get-file',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+              console.log("success");
+
+              const result = data["responseMessage"];
+              const filename = data["filename"];
+              console.log(filename)
+              console.log(result)
+              document.getElementById('access-level').innerHTML = "private";
+              document.getElementById('oldfilepath').innerHTML = filename;
+              document.getElementById('textBox').innerHTML = result;
+              $('#myModalEdit').modal('show');
+          }
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+      }
+  });
+  }
+
+  function editPublicFileOnServer(filepath){
+        const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+
+    const userData = {
+        "username": userInformation.username,
+        "file_name": filepath
+    };
+      $.ajax({
+      url: '/get-public-file',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+              console.log("success");
+
+              const result = data[0]["fileData"];
+              const filename = data[0]["filePath"];
+              console.log(filename)
+              console.log(result)
+              document.getElementById('access-level').innerHTML = "public";
+              document.getElementById('oldfilepath').innerHTML = filename;
+              document.getElementById('textBox').innerHTML = result;
+              $('#myModalEdit').modal('show');
+          }
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+      }
+  });
+  }
+
+  function deleteFileOnServer(filepath,fileType) {
+      const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+    var userData = {};
+    url_path = "";
+    if(fileType === "private"){
+        url_path = "/delete-file";
+        userData = {
+        "username": userInformation.username,
+        "secret_key": userInformation.secret_key,
+        "encrypted_file_path": filepath
+    };
+    }else if(fileType === "shared"){
+        url_path = "/delete_shared_file";
+        userData = {
+        "username": userInformation.username,
+        "secret_key": userInformation.secret_key,
+        "encrypted_file_path": filepath
+    };
+    }
+    else{
+        url_path = "/delete-public-file";
+        userData = {
+        "username": userInformation.username,
+        "file_name": filepath
+    };
+    }
+    console.log(userData);
+    console.log(url_path);
+      $.ajax({
+      url: url_path,
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+              console.log("success");
+              const result = data.responseMessage;
+              console.log(result);
+              alert(result);
+              window.location.reload();
+          }
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+      }
+  });
+  }
+
+
+  function loadpublicfiles() {
+      $.ajax({
+      url: '/getpublicfiles',
+      type: "GET",
+      dataType: "json",
+      data : {},
+      success: function (data) {
+          console.log("success");
+          console.log("Data: " + JSON.stringify(data));
+          // Display data into public files section
+
+
+          const myTableDiv = document.getElementById("myDynamicTablePublic");
+
+          const table = document.createElement('TABLE');
+              table.border = '1';
+              table.width = 1200;
+
+              const tableBody = document.createElement('TBODY');
+              table.appendChild(tableBody);
+              const keys = Object.keys(data);
+              const publicFiles = {};
+              for (let j = 0; j < keys.length; j++) {
+                  const tr = document.createElement('TR');
+                  tableBody.appendChild(tr);
+                  let td = document.createElement('TD');
+                  td.width = '900';
+                  /* td.appendChild(document.createTextNode(data[keys[i]])); */
+                  const filePath = data[j]["filePath"];
+                  const owner = data[j]["fileOwner"];
+                  console.log(filePath);
+                  let rowVal = "<a href=\"#\" id=\"" + filePath + "\" onclick=\"\">" + filePath + "</a>";
+                  td.innerHTML = rowVal
+                  /* td.appendChild(document.createelement(rowVal)) */;
+                  tr.appendChild(td);
+
+                  td = document.createElement('TD');
+                  td.width = 200;
+                  rowVal = "Owner : " + owner;
+                  td.innerHTML = rowVal
+                  tr.appendChild(td);
+
+                  td = document.createElement('TD');
+                  rowVal = "<button style=\"width: 111px;\"  type=\"button\" id=\""+ filePath + "\" onclick=\"getPublicFileFromServer(this.id)\"> View </button>";
+                  td.innerHTML = rowVal
+                  tr.appendChild(td);
+
+                  td = document.createElement('TD');
+                  rowVal = "<button style=\"width: 111px;\"  type=\"button\" id=\""+ filePath + "\" onclick=\"editPublicFileOnServer(this.id)\"> Edit </button>";
+                  td.innerHTML = rowVal
+                  tr.appendChild(td);
+
+                  td = document.createElement('TD');
+                  rowVal = "<button style=\"width: 111px;\"  type=\"button\" id=\""+ filePath + "\" onclick=\"deleteFileOnServer(this.id,'public')\"> Delete </button>";
+                  td.innerHTML = rowVal
+                  tr.appendChild(td);
+
+                  td = document.createElement('TD');
+                  rowVal = "<button style=\"width: 111px;\" type=\"button\" id=\""+ filePath + "\" onclick=\"changePermission(this.id,'public')\"> Make Private </button>";
+                  td.innerHTML = rowVal
+                  tr.appendChild(td);
+                   if(publicFiles[owner] == null){
+                    const filePaths = [];
+                    filePaths.push(filePath);
+                    publicFiles[owner] = filePaths;
+                    }else{
+                        const filePaths = publicFiles[owner];
+                        filePaths.push(filePath);
+                        publicFiles[owner] = filePaths;
+                    }
+                  }
+              myTableDiv.appendChild(table);
+              localStorage.setItem("PublicFiles", JSON.stringify(publicFiles));
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+
+      }
+  });
+  }
+
+
+  function loadprivatefiles(){
+    const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+
+    const userData = {
+        "username": userInformation.username,
+        "secret_key": userInformation.secret_key
+    };
+
+    $.ajax({
+      url: '/getprivatefiles',
+      type: "GET",
+      dataType: "json",
+      data: userData,
+      success: function (data) {
+          console.log("success");
+          console.log("Data: " + JSON.stringify(data));
+
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+              const results = data.responseMessage;
+              localStorage.setItem("PrivateFiles", JSON.stringify(results));
+              const files = Object.keys(results);
+              const select = document.getElementById("selectFile");
+              for (let i = 0; i < files.length; i++) {
+                  const opt = files[i];
+                  const el = document.createElement("option");
+                  el.textContent = opt;
+                  el.value = opt;
+                  select.appendChild(el);
+              }
+              // Display data into private files section
+              //   var data = {name1:"Murari", age1:"23", car1:"Ford"}
+
+              var myTableDiv = document.getElementById("myDynamicTablePvt");
+
+              var table = document.createElement('TABLE');
+              table.border = '1';
+              table.width = 1200;
+              var tableBody = document.createElement('TBODY');
+              table.appendChild(tableBody);
+              var keys = Object.keys(results)
+              for (var j = 0; j < keys.length; j++) {
+                  var tr = document.createElement('TR');
+                  tableBody.appendChild(tr);
+                  var td = document.createElement('TD');
+                  td.width = '600';
+                  /* td.appendChild(document.createTextNode(data[keys[i]])); */
+                  var rowVal = "<a href=\"#\" id=\"" + results[keys[j]] + "\" onclick=\"\">" + (keys[j]).toString();
+                  +"</a>";
+                  td.innerHTML = rowVal
+                  /* td.appendChild(document.createelement(rowVal)) */;
+                  tr.appendChild(td);
+                  //From Here
+                  td = document.createElement('TD');
+                  rowVal = "<button style=\"width: 150px;\"  type=\"button\" id=\""+ results[keys[j]] + "\" onclick=\"getFileFromServer(this.id)\"> View Decrypted </button>";
+                  td.innerHTML = rowVal
+                  tr.appendChild(td);
+
+                  td = document.createElement('TD');
+                  rowVal = "<button style=\"width: 150px;\"  type=\"button\" id=\""+ results[keys[j]] + "\" onclick=\"getEncryptedFileFromServer(this.id)\"> View Encrypted </button>";
+                  td.innerHTML = rowVal
+                  tr.appendChild(td);
+
+                  td = document.createElement('TD');
+                  rowVal = "<button style=\"width: 111px;\"  type=\"button\" id=\""+ results[keys[j]] + "\" onclick=\"editFileOnServer(this.id)\"> Edit </button>";
+                  td.innerHTML = rowVal
+                  tr.appendChild(td);
+
+                  td = document.createElement('TD');
+                  rowVal = "<button style=\"width: 111px;\"  type=\"button\" id=\""+ results[keys[j]] + "\" onclick=\"deleteFileOnServer(this.id,'private')\"> Delete </button>";
+                  td.innerHTML = rowVal
+                  tr.appendChild(td);
+
+                  td = document.createElement('TD');
+                  rowVal = "<button style=\"width: 111px;\"  type=\"button\" id=\""+ results[keys[j]] + "\" onclick=\"changePermission(this.id,'private')\"> Make Public </button>";
+                  td.innerHTML = rowVal
+                  tr.appendChild(td);
+              }
+              myTableDiv.appendChild(table);
+          }
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+        //   alert("Malicious activity has been detected on server");
+      }
+  });
+  }
+
+
+  function loadsharedfiles() {
+
+      const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+
+    const userData = {
+        "username": userInformation.username,
+        "secret_key": userInformation.secret_key
+    };
+
+    $.ajax({
+      url: '/getsharedfiles',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          console.log("success");
+          console.log("Data: " + JSON.stringify(data));
+
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+              const results = data.responseMessage;
+              const shared_by_results = data.shared_by;
+              localStorage.setItem("SharedFiles", JSON.stringify(results));
+              localStorage.setItem("SharedFilesBy", JSON.stringify(shared_by_results));
+            // Display data into Shared files section
+            var myTableDiv = document.getElementById("myDynamicTableShared");
+
+          var table = document.createElement('TABLE');
+          table.border = '1';
+          table.width = 1200;
+          var tableBody = document.createElement('TBODY');
+          table.appendChild(tableBody);
+          var keys = Object.keys(results)
+          for (var j = 0; j < keys.length; j++) {
+              const file_name = keys[j];
+              const shared_by = shared_by_results[file_name];
+              var tr = document.createElement('TR');
+              tableBody.appendChild(tr);
+              var td = document.createElement('TD');
+              td.width = '900';
+              /* td.appendChild(document.createTextNode(data[keys[i]])); */
+              var rowVal = "<a href=\"#\" id=\"" + results[keys[j]] + "\" onclick=\"\">" + (keys[j]).toString();
+              +"</a>";
+              td.innerHTML = rowVal
+              /* td.appendChild(document.createelement(rowVal)) */;
+              tr.appendChild(td);
+              //From Here
+              td = document.createElement('TD');
+              td.width = 400;
+              rowVal = "Shared By : " + shared_by.toString();
+              td.innerHTML = rowVal
+              tr.appendChild(td);
+
+              td = document.createElement('TD');
+              rowVal = "<button style=\"width: 150px;\"  type=\"button\" id=\""+ results[keys[j]] + "\" onclick=\"getSharedFileFromServer(this.id)\"> View Decrypted </button>";
+              td.innerHTML = rowVal
+              tr.appendChild(td);
+
+              td = document.createElement('TD');
+              rowVal = "<button style=\"width: 150px;\"  type=\"button\" id=\""+ results[keys[j]] + "\" onclick=\"getEncryptedSharedFileFromServer(this.id)\"> View Encrypted </button>";
+              td.innerHTML = rowVal
+              tr.appendChild(td);
+
+              td = document.createElement('TD');
+              rowVal = "<button style=\"width: 111px;\"  type=\"button\" id=\""+ results[keys[j]] + "\" onclick=\"deleteFileOnServer(this.id,'shared')\"> Delete </button>";
+              td.innerHTML = rowVal
+              tr.appendChild(td);
+          }
+          myTableDiv.appendChild(table);
+          }
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+      }
+  });
+  }
+
+  function Uploadfiles() {
+    const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+    const publicFiles = JSON.parse(
+        localStorage.getItem("PublicFiles")
+    );
+    const privateFiles = JSON.parse(
+        localStorage.getItem("PrivateFiles")
+    );
+
+    const results = publicFiles[userInformation.username]
+    const private_keys = Object.keys(privateFiles);
+
+    const file_names = private_keys.concat(results);
+    console.log(file_names);
+
+    const filepath= $("#filepath").val();
+    const filedata= $("#filedata").val();
+    const access_level = $("#selectAccessLevel").val();
+
+    if (filepath.trim() === "" || filedata === ""){
+        alert("Please enter valid filepath and filedata");
+        return null;
+    }
+
+    if (file_names.includes(filepath)){
+        alert("File with that name already exists. Please try another name !!");
+        return null;
+    }
+    const userData = {
+        "username": userInformation.username,
+        "secret_key": userInformation.secret_key,
+        "filepath": filepath,
+        "file_data": filedata,
+        "access_level": access_level
+    };
+    $.ajax({
+      url: '/update',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          console.log("success");
+          console.log("Data: " + JSON.stringify(data));
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+             const message = data.responseMessage;
+             console.log(message);
+             alert(message);
+             window.location.reload();
+          }
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+      }
+  });
+
+  }
+
+  function Sharefiles() {
+    const userInformation = JSON.parse(
+        localStorage.getItem("UserDetails")
+    );
+    const privateFiles = JSON.parse(
+        localStorage.getItem("PrivateFiles")
+    );
+    const share_with = $("#selectUser").val();
+    const file = $("#selectFile").val();
+    console.log(privateFiles[file]);
+    const userData = {
+        "username": userInformation.username,
+        "secret_key": userInformation.secret_key,
+        "encrypted_file_path": privateFiles[file],
+        "share_with": share_with
+    };
+    $.ajax({
+      url: '/share-file-with-user',
+      type: "GET",
+      dataType: "json",
+      data : userData,
+      success: function (data) {
+          console.log("success");
+          console.log("Data: " + JSON.stringify(data));
+
+          if (data.responseCode === 0) {
+              const url = "http://127.0.0.1:8000/error/";
+              window.location.replace(url);
+          }
+          else {
+             const message = data.responseMessage;
+             console.log(message);
+             alert(message);
+             window.location.reload();
+          }
+      },
+      error: function (error) {
+          console.log(error);
+          alert(error);
+      }
+  });
+  }
+</script>
+</body>

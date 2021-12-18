@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Encryption System</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta charset="utf-8" />
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+</head>
+<body>
+
+    <div class="modal fade" id="modalRegisterForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+      aria-hidden="true">
+      <h4 class="modal-title w-100 font-weight-bold">EFS Register Page</h4>
+          <div class="modal-footer d-flex justify-content-center">
+              <div class="md-form mb-5">
+              <i class="fas fa-user prefix grey-text"></i>
+              <input type="text" id="username" class="modal_username" placeholder="Username">
+                </div><br><br>
+            <button class="btn btn-deep-orange" onclick="signup()">Sign up</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div id="login-page">
+
+    </div>
+    <div id="privateKey" style="
+    margin-left: 10%;
+    width: 80%;
+    overflow-wrap: anywhere;
+    padding-top: 20px;
+    ">
+
+    </div>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script>
+function loginpage(){
+    window.location.replace("http://127.0.0.1:8000/login/");
+};
+function signup(){
+    const username = document.getElementById('username').value;
+    console.log(username);
+    const userData = {
+        "username": username
+    };
+    console.log(userData);
+        $.ajax({
+            url: '/signup',
+            type: "GET",
+            data: userData,
+            dataType: "json",
+            success: function (data) {
+                console.log(data);
+                const secret_key = data;
+                console.log(secret_key)
+                alert("Your secret key is generated and will be shown in the next alert. Please save it in a safe location");
+                document.getElementById('privateKey').innerHTML = secret_key;
+
+                document.getElementById('login-page').innerHTML = "<button class=\"btn btn-deep-orange\" onclick=\"loginpage()\">Login</button>"
+                
+            },
+            error: function (error) {
+                console.log(JSON.stringify(error['responseJSON']));
+                // console.log(`Error ${error}`);
+                alert(JSON.stringify(error['responseJSON']));
+                window.location.reload();
+            }
+        });
+}
+
+
+</script>
+
+</body>
+</html>

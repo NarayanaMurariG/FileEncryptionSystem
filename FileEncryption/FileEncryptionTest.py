@@ -1,0 +1,60 @@
+from AESModule import decryptFile,generateAESKey,encryptFile
+from RSAModule import encryptSharedAESKey
+from RSAModule import decryptAESKey,encryptAESKey
+from UserOnboarding import generatePublicPrivateKeys
+from Crypto import Random
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+from Crypto.Random import get_random_bytes
+from base64 import b64encode, b64decode
+import json
+import os
+from shutil import copyfile
+# from PasteBin import post_paste, fetch_pastes
+
+def generateAllKeys():
+    AES_key = generateAESKey()
+    # iv = b64encode(cipher.iv).decode('utf-8')
+    # ct = b64encode(ct_bytes).decode('utf-8')
+    # result = json.dumps({'iv':iv, 'ciphertext':ct})
+    pemPvt,pemPbc = generatePublicPrivateKeys()
+    
+    AES_key_ = b64encode(encryptAESKeyTest(AES_key,pemPbc)).decode('utf-8')
+    print("-------------------------------")
+    print(AES_key_)
+    pemPvt_ = b64encode(pemPvt).decode('utf-8')
+    print("-------------------------------")
+    print(pemPvt_)
+    pemPbc_ = b64encode(pemPbc).decode('utf-8')
+    print("-------------------------------")
+    print(pemPbc_)
+
+def encryptAESKeyTest(AES_Key,pemPbc):
+    encryptedAESKey = encryptAESKey(AES_Key,pemPbc)
+    return encryptedAESKey
+
+def saveFileToDB():
+    encryptedAESKey = b64decode("xsBdRns1b/6IqkHR3vP6XiEGAcKGYXA5U1F7Ve65+rnzY1/3sr4EHII7t3A9xw3Hrw68UgtDVfftqyDjm8e/CNhv/rnHruzfPEnBMv1Hq2R54LADa9NjTruMWtVDsNI2rz9aQxamhjk6QS73JCGIQ2D+rpvcJW9kUIaGTH6iKyKjLYtbeAPz3Ug2IVRjunQg+qD8ngdOxMTcPirWCpncE0EGoDWI7/WNbFy+wV5/bD3Mf7RsieG5MZYNdfdnKwFUj9ssnhVE7h0dl5T3i73pdm6xyRmvm557HmI/96kqnB03xh0w1ZYTQd6fWrFSWRtiIZEgug//aTJoho5pYlZZrQ==")
+    pemPvt = b64decode("LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2d0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktrd2dnU2xBZ0VBQW9JQkFRRGsrSXB0Vmd0bjJidy8KRFhrWFJ1b0c2akpYUUNjSWVPRW5tZkdLQThjY3J4Q1FuM2lYNmFDdDZMenRhTFBkcGgxbUJqU3Zsc2s2d3BhdQoveDkrb0k1SGR2NWZQdjhIanN2U3MxcmtPcFhVZElLWU5DNzFUdU1TL1VvYkdFR01acy9CV2hWMjVsSS8zY1RuClJ2akduNS9GeUJ5R2IvWUNzVk9XOCtFWmFJSjFsMlZQbm9XUDFYOENSVG1aSkMvY2xJQUloNDJEV2ZHMjF4Q00KZGFTSXdQN0ozOHlaT3pOODRtNitLUlRXMUxMZ0pWSUxvTnJvaGlORGhLU0tWa1BuN1N4QWZFNzljK29xcGtGVQphU3RpaVFMeEpTaUhkTkllN0pIVE1ramFWVHY2Uk8wQXVPQjNPQ2VoSEZjM0JON0JpT1VFaUlKcFF5K2VkUkc1CmM4bXNzOUlCQWdNQkFBRUNnZ0VBWUcyTFhxQnVEVDVWV1BpRGxwbjIxUktzUUxKenZjMnFoTk1BTmUrQlcwTWUKNXNsQ01EZmp3MW5RdHVyeFZOY3dhbGNTdVIvM2Z4ZVQvZjdUZExDSk91K1NFT3FtM0xmMmZyV3FBWlBxcFo2cgpvUTNZK05aUUt4OGdwbWlBc25CWjdrUFI1bEQ1TW94aThFT2pZWUszOXNOZnYvNUd6THVCU0lGTXV6YVlPb3pMCjNycUFydlExUFJrNXRlY2ZpbTMyZjZPQXJxRXpCQ3NjM1YrS3ZtaTIvMWhJNW5iZzNFVUxyckNQa0pxSnM0SDcKSmpuTmZTZnA3ZE55Rk0ybFNnVzRYT3NYZUZYeFM4eWcrMm5sYllRMm0vWkIwbktjVmplM09mK2RRbzVZVFRxTAo0M05YZk5zLytybjlUMEdkQzVIRzVPL1BReGZDT25qcG1wQ3JGYUNEUVFLQmdRRDBjd2tpbDg2R0VPdXpkWk5TCm1JNFEvZUo2d0JvZVR5QWRQK1R4bVdTRXZhNHhKOVlncnZRSWJZMlNJZ0lpWmI4N1ViSjlrRkhGbWJRb2xGaE0Kbm9oalhMVVA1K2ExRVVoTVRKT25CcmIxSm03RUhpVENwWENaQXg5bzJ2ZGVreXo2NGVVaTcyRkFHRDd4K3V1UApPWUdsaGpObVgzRGZFMmxZZTN5TkJrb0J0d0tCZ1FEdnlrVkF2M0J6TjQ5VkJsSjd2NnVaemdDaS9rd2cwcnVLCm1DTVpwcHc5dUZubHFFNllveUsya1Zqa2ZyV0hsNGJBSVN6MUdXRDRaYmh4ZnZrZmxQcUJDWEQ3WVIwNFdRMW4KRkg3OUY1emk1cVJPcWRRQkpVenpkRXVscDJjZEhCOUlFT0pVd1JsRmE0bFN2eWF6bFQ5U2sxZ0o1K3QraHp0NAo4emp0bzhocUJ3S0JnUURpRDR3d0tKRitIQ0hOS1h0ZmsrTTF4WVJ2bmozSkw4VjBKMFdUUkJiWVJ3M1RPWkxsClVNWXZFUmt1UGpNWkdsMFovM2lBZERtYThvVFFUamZHUzRtMzBlRkQzMkxVcWpIaEZhUXFmNlFzM0NqdFJ5OFoKcnFPTmJYemJuRHZOZzIvQ1o2dGVmbC9DUlduWW9BSzl4aUdtTUpCU0tRc1owVHJIOEJNRDNBQU95d0tCZ1FEZAowRzVmaHJldTNTWnBzSDk4bWNGVGRZeUJPbHVSd1Y1YXhvRXhxVDIrbWxvT1o3TE0zNXVzNXFja04xSVZLOFlxCjFJV1I5UGdPejRuZTgyWGdJUi9aWGJKMTExQUFYK0JXQ2srdUw3bWc2MW55cW9iQ3lJNTJabzNUbnhkemhpQXAKdWZTa0Vqd2VTMnVzYjhhTk9QSnFvSUpBSjVsZ1loaFJ1aXhmSjdLczRRS0JnUUNaMmZYVFpMR0xRVStieGJUSQpzUTBvOGtTaXpvMVYwSld5YjRaMEpOT3VnWUlncTc2a0N1UkJnbC9Vb1BDbmxRMlAzaDUxSGdFdWlONnRsaW1HClloZmRpQ1pIeVB6TkVNaGFrRzVXVjFockc2UFRLdVRPUlBteEJHK1Bzbm1hdG9OZk9rSHVkUHNGSmJnNTMzR04KSk5sY09HRzQrald2bjR0VXdkUEVGU2NEU3c9PQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg==")
+    AES_Key = decryptAESKey(encryptedAESKey,pemPvt)
+    text = "The new MacBook Pro and AirPods, plus iPhone 13, Apple Watch, iPad, HomePod mini and more. Shop early for the best selection of holiday favorites."
+    fileName = "Apple"
+    key,iv = encryptFile(fileName,bytes(text, 'utf-8'),AES_Key)
+    print("Key : ",key)
+    print("IV : ",iv)
+
+
+def getFileFromDB():
+    encryptedAESKey = b64decode("xsBdRns1b/6IqkHR3vP6XiEGAcKGYXA5U1F7Ve65+rnzY1/3sr4EHII7t3A9xw3Hrw68UgtDVfftqyDjm8e/CNhv/rnHruzfPEnBMv1Hq2R54LADa9NjTruMWtVDsNI2rz9aQxamhjk6QS73JCGIQ2D+rpvcJW9kUIaGTH6iKyKjLYtbeAPz3Ug2IVRjunQg+qD8ngdOxMTcPirWCpncE0EGoDWI7/WNbFy+wV5/bD3Mf7RsieG5MZYNdfdnKwFUj9ssnhVE7h0dl5T3i73pdm6xyRmvm557HmI/96kqnB03xh0w1ZYTQd6fWrFSWRtiIZEgug//aTJoho5pYlZZrQ==")
+    pemPvt = b64decode("LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2d0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktrd2dnU2xBZ0VBQW9JQkFRRGsrSXB0Vmd0bjJidy8KRFhrWFJ1b0c2akpYUUNjSWVPRW5tZkdLQThjY3J4Q1FuM2lYNmFDdDZMenRhTFBkcGgxbUJqU3Zsc2s2d3BhdQoveDkrb0k1SGR2NWZQdjhIanN2U3MxcmtPcFhVZElLWU5DNzFUdU1TL1VvYkdFR01acy9CV2hWMjVsSS8zY1RuClJ2akduNS9GeUJ5R2IvWUNzVk9XOCtFWmFJSjFsMlZQbm9XUDFYOENSVG1aSkMvY2xJQUloNDJEV2ZHMjF4Q00KZGFTSXdQN0ozOHlaT3pOODRtNitLUlRXMUxMZ0pWSUxvTnJvaGlORGhLU0tWa1BuN1N4QWZFNzljK29xcGtGVQphU3RpaVFMeEpTaUhkTkllN0pIVE1ramFWVHY2Uk8wQXVPQjNPQ2VoSEZjM0JON0JpT1VFaUlKcFF5K2VkUkc1CmM4bXNzOUlCQWdNQkFBRUNnZ0VBWUcyTFhxQnVEVDVWV1BpRGxwbjIxUktzUUxKenZjMnFoTk1BTmUrQlcwTWUKNXNsQ01EZmp3MW5RdHVyeFZOY3dhbGNTdVIvM2Z4ZVQvZjdUZExDSk91K1NFT3FtM0xmMmZyV3FBWlBxcFo2cgpvUTNZK05aUUt4OGdwbWlBc25CWjdrUFI1bEQ1TW94aThFT2pZWUszOXNOZnYvNUd6THVCU0lGTXV6YVlPb3pMCjNycUFydlExUFJrNXRlY2ZpbTMyZjZPQXJxRXpCQ3NjM1YrS3ZtaTIvMWhJNW5iZzNFVUxyckNQa0pxSnM0SDcKSmpuTmZTZnA3ZE55Rk0ybFNnVzRYT3NYZUZYeFM4eWcrMm5sYllRMm0vWkIwbktjVmplM09mK2RRbzVZVFRxTAo0M05YZk5zLytybjlUMEdkQzVIRzVPL1BReGZDT25qcG1wQ3JGYUNEUVFLQmdRRDBjd2tpbDg2R0VPdXpkWk5TCm1JNFEvZUo2d0JvZVR5QWRQK1R4bVdTRXZhNHhKOVlncnZRSWJZMlNJZ0lpWmI4N1ViSjlrRkhGbWJRb2xGaE0Kbm9oalhMVVA1K2ExRVVoTVRKT25CcmIxSm03RUhpVENwWENaQXg5bzJ2ZGVreXo2NGVVaTcyRkFHRDd4K3V1UApPWUdsaGpObVgzRGZFMmxZZTN5TkJrb0J0d0tCZ1FEdnlrVkF2M0J6TjQ5VkJsSjd2NnVaemdDaS9rd2cwcnVLCm1DTVpwcHc5dUZubHFFNllveUsya1Zqa2ZyV0hsNGJBSVN6MUdXRDRaYmh4ZnZrZmxQcUJDWEQ3WVIwNFdRMW4KRkg3OUY1emk1cVJPcWRRQkpVenpkRXVscDJjZEhCOUlFT0pVd1JsRmE0bFN2eWF6bFQ5U2sxZ0o1K3QraHp0NAo4emp0bzhocUJ3S0JnUURpRDR3d0tKRitIQ0hOS1h0ZmsrTTF4WVJ2bmozSkw4VjBKMFdUUkJiWVJ3M1RPWkxsClVNWXZFUmt1UGpNWkdsMFovM2lBZERtYThvVFFUamZHUzRtMzBlRkQzMkxVcWpIaEZhUXFmNlFzM0NqdFJ5OFoKcnFPTmJYemJuRHZOZzIvQ1o2dGVmbC9DUlduWW9BSzl4aUdtTUpCU0tRc1owVHJIOEJNRDNBQU95d0tCZ1FEZAowRzVmaHJldTNTWnBzSDk4bWNGVGRZeUJPbHVSd1Y1YXhvRXhxVDIrbWxvT1o3TE0zNXVzNXFja04xSVZLOFlxCjFJV1I5UGdPejRuZTgyWGdJUi9aWGJKMTExQUFYK0JXQ2srdUw3bWc2MW55cW9iQ3lJNTJabzNUbnhkemhpQXAKdWZTa0Vqd2VTMnVzYjhhTk9QSnFvSUpBSjVsZ1loaFJ1aXhmSjdLczRRS0JnUUNaMmZYVFpMR0xRVStieGJUSQpzUTBvOGtTaXpvMVYwSld5YjRaMEpOT3VnWUlncTc2a0N1UkJnbC9Vb1BDbmxRMlAzaDUxSGdFdWlONnRsaW1HClloZmRpQ1pIeVB6TkVNaGFrRzVXVjFockc2UFRLdVRPUlBteEJHK1Bzbm1hdG9OZk9rSHVkUHNGSmJnNTMzR04KSk5sY09HRzQrald2bjR0VXdkUEVGU2NEU3c9PQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg==")
+    AES_Key = decryptAESKey(encryptedAESKey,pemPvt)
+    key = "b'\\x00X\\x92\\xe4>\\xa4u\\xf9\\x83\\xe9'"
+    iv = "gBBnYHzAr5Msnbdz+XAhiA=="
+    decryptFile(key,AES_Key,iv)
+
+
+
+if __name__ == "__main__":
+    # saveFileToDB()
+    # getFileFromDB()
+    generateAllKeys()

@@ -1,0 +1,7 @@
+Django==3.2.9
+tinydb==4.5.2
+djangorestframework==3.12.4
+cryptography=35.0.0
+pycryptodome=3.11.0
+requests=2.26.0
+
