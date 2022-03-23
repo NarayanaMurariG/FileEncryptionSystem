@@ -1,4 +1,4 @@
-# NebulaEFS
+# Encrypted File System
 
 We suggest using a version of Python 3. Python 3.9 is recommended.
 
